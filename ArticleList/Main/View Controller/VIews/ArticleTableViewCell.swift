@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Nuke
 
 class ArticleTableViewCell: UITableViewCell {
     
@@ -25,6 +26,7 @@ class ArticleTableViewCell: UITableViewCell {
             articleImage.isHidden = true
         } else {
             articleImage.isHidden = false
+            Nuke.loadImage(with: article.imageURL, into: articleImage)
         }
     }
     
