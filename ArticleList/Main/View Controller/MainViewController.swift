@@ -12,13 +12,12 @@ class MainViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     
-    private var viewModel: MainViewModelProtocol!
+    var viewModel: MainViewModelProtocol!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupNavigation()
-        setupViewModel()
         setupBindings()
         setupTableView()
     }
@@ -27,15 +26,7 @@ class MainViewController: UIViewController {
         super.viewWillAppear(animated)
         viewModel.viewIsReady()
     }
-    
-    private func setupViewModel() {
-        let articlesFeedDataSource = ArticlesFeedDataSource()
-        let articlesDefaultDataSource = ArticlesDefaultDataSource()
-        let localDataSource = ArticlesLocalDataSource()
-        let repository = ArticlesRepository(firstDataSource: articlesFeedDataSource, secondDataSource: articlesDefaultDataSource, localDataSource: localDataSource)
-        viewModel = MainViewModel(articlesRepository: repository)
-    }
-    
+
     private func setupNavigation() {
         self.title = "News"
         let item = UIBarButtonItem(title: "Save", style: .plain, target: self, action: #selector(handleSaveButton))
