@@ -22,51 +22,54 @@ struct ArticlesRepository: ArticlesRepositoryProtocol {
     }
     
     func getArticles(completionHandler: @escaping CompletionHandler) {
-        
-        guard NetworkConnectionManager.shared.isReachable == true  else {
-            localDataSource.get(completionHandler: completionHandler)
-            return
-        }
-        
-        var articles = [Article]()
-        var errors = [ALError]()
-        
-        //here I use semaphore because two different tasks must use same shared resource
-        let semaphore = DispatchSemaphore(value: 0)
-        
-        firstDataSource.get { result in
-            switch result {
-                
-            case .success(let arts):
-                articles += arts
-            case .failure(let error):
-                errors.append(error)
+        DispatchQueue.global().async {
+            guard NetworkConnectionManager.shared.isReachable == true  else {
+                localDataSource.get(completionHandler: completionHandler)
+                return
             }
-            semaphore.signal()
-        }
-        semaphore.wait()
-        
-        secondDataSource.get { result in
-            switch result {
-                
-            case .success(let arts):
-                articles += arts
-            case .failure(let error):
-                errors.append(error)
+            
+            var articles = [Article]()
+            var errors = [ALError]()
+            
+            //here I use semaphore because two different tasks must use same shared resource
+            let semaphore = DispatchSemaphore(value: 0)
+            
+            firstDataSource.get { result in
+                switch result {
+                    
+                case .success(let arts):
+                    articles += arts
+                case .failure(let error):
+                    errors.append(error)
+                }
+                semaphore.signal()
             }
-            semaphore.signal()
-        }
-        semaphore.wait()
-        
-        if errors.isEmpty {
-            completionHandler(.success(articles))
-        } else {
-            print(errors)
-            completionHandler(.failure(errors.first!))
+            semaphore.wait()
+            
+            secondDataSource.get { result in
+                switch result {
+                    
+                case .success(let arts):
+                    articles += arts
+                case .failure(let error):
+                    errors.append(error)
+                }
+                semaphore.signal()
+            }
+            semaphore.wait()
+            
+            if errors.isEmpty {
+                completionHandler(.success(articles))
+            } else {
+                print(errors)
+                completionHandler(.failure(errors.first!))
+            }
         }
     }
     
     func saveArticles(articles: [Article], format: DataFormat) {
-        localDataSource.save(items: articles, format: format)
+        DispatchQueue.global().async {
+            localDataSource.save(items: articles, format: format)
+        }
     }
 }

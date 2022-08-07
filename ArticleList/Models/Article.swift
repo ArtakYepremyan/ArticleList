@@ -40,8 +40,10 @@ struct Article: Codable {
         try container.encode(title, forKey: .title)
         try container.encode(description, forKey: .description)
         try container.encode(publishedDate.toStringShortFormat(), forKey: .publishedDate)
-        try container.encodeIfPresent(imageURL?.absoluteString, forKey: .imageURL)
-        try container.encodeIfPresent(url?.absoluteString, forKey: .url)
+        let imageUrlString = imageURL?.absoluteString ?? " "
+        try container.encode(imageUrlString, forKey: .imageURL)
+        let urlString = url?.absoluteString ?? " "
+        try container.encodeIfPresent(urlString, forKey: .url)
     }
     
     init(title: String, description: String, date: String, url: String, imageUrl: String) {
