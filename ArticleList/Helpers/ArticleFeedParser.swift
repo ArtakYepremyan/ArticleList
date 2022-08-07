@@ -40,6 +40,7 @@ class ArticleFeedParser: NSObject {
     
     
     func parseFeed(data: Data, completionHandler: @escaping (Result<[Article], ALError>) -> ()) {
+        self.rssItems = []
         self.parserComplitionHandler = completionHandler
         let parser = XMLParser(data: data)
         parser.delegate = self
