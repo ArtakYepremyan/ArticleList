@@ -9,10 +9,9 @@ import Foundation
 
 protocol ArticlesRepositoryProtocol {
     
-    typealias CompletionHandlerResult = Result<[Article], NetworkError>
+    typealias CompletionHandlerResult = Result<[Article], ALError>
     typealias CompletionHandler = ((CompletionHandlerResult) -> ())
-    typealias SavingCompletionHandler = (Bool) -> ()
 
     func getArticles(completionHandler: @escaping CompletionHandler)
-    func saveArticles(articles: [Article], completion: SavingCompletionHandler)
+    func saveArticles(articles: [Article], format: DataFormat)
 }

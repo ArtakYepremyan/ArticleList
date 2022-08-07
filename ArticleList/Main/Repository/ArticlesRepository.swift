@@ -12,17 +12,24 @@ struct ArticlesRepository: ArticlesRepositoryProtocol {
     
     let firstDataSource: ArticlesDataSourceProtocol
     let secondDataSource: ArticlesDataSourceProtocol
+    let localDataSource: ArticlesLocalDataSourceProtocol
 
     
-    init(firstDataSource: ArticlesDataSourceProtocol, secondDataSource:  ArticlesDataSourceProtocol) {
+    init(firstDataSource: ArticlesDataSourceProtocol, secondDataSource:  ArticlesDataSourceProtocol, localDataSource: ArticlesLocalDataSourceProtocol) {
         self.firstDataSource = firstDataSource
         self.secondDataSource = secondDataSource
+        self.localDataSource = localDataSource
     }
     
     func getArticles(completionHandler: @escaping CompletionHandler) {
         
+        guard NetworkConnectionManager.shared.isReachable == true  else {
+            localDataSource.get(completionHandler: completionHandler)
+            return
+        }
+        
         var articles = [Article]()
-        var errors = [NetworkError]()
+        var errors = [ALError]()
         
         //here I use semaphore because two different tasks must use same shared resource
         let semaphore = DispatchSemaphore(value: 0)
@@ -59,7 +66,7 @@ struct ArticlesRepository: ArticlesRepositoryProtocol {
         }
     }
     
-    func saveArticles(articles: [Article], completion: (Bool) -> ()) {
-        
+    func saveArticles(articles: [Article], format: DataFormat) {
+        localDataSource.save(items: articles, format: format)
     }
 }

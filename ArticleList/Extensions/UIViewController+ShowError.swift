@@ -10,7 +10,7 @@ import UIKit
 
 extension UIViewController {
     
-    func showError(error: NetworkError) {
+    func showError(error: ALError) {
         switch error {
         case .http(let statusCode):
             presentAlert(withTitle: "Error", message: "Status code \(statusCode)")

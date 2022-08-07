@@ -35,12 +35,21 @@ struct Article: Codable {
         publishedDate = dateString.toDateShortFormat() ?? Date()
     }
     
-    init(title: String, description: String, date: String, url: String) {
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(title, forKey: .title)
+        try container.encode(description, forKey: .description)
+        try container.encode(publishedDate.toStringShortFormat(), forKey: .publishedDate)
+        try container.encodeIfPresent(imageURL?.absoluteString, forKey: .imageURL)
+        try container.encodeIfPresent(url?.absoluteString, forKey: .url)
+    }
+    
+    init(title: String, description: String, date: String, url: String, imageUrl: String) {
         //I use this initializer for creating objects from xml
         self.title = title
         self.description = description
         self.publishedDate = date.toDateLongFormat() ?? Date()
-        self.imageURL = nil //here imageUrl is nil because given api doesn't provide that data
+        self.imageURL = URL(string: imageUrl)
         self.url = URL(string: url)
     }
 }

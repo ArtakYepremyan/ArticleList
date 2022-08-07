@@ -17,7 +17,7 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.title = "News"
+        setupNavigation()
         setupViewModel()
         setupBindings()
         setupTableView()
@@ -31,8 +31,30 @@ class MainViewController: UIViewController {
     private func setupViewModel() {
         let articlesFeedDataSource = ArticlesFeedDataSource()
         let articlesDefaultDataSource = ArticlesDefaultDataSource()
-        let repository = ArticlesRepository(firstDataSource: articlesFeedDataSource, secondDataSource: articlesDefaultDataSource)
+        let localDataSource = ArticlesLocalDataSource()
+        let repository = ArticlesRepository(firstDataSource: articlesFeedDataSource, secondDataSource: articlesDefaultDataSource, localDataSource: localDataSource)
         viewModel = MainViewModel(articlesRepository: repository)
+    }
+    
+    private func setupNavigation() {
+        self.title = "News"
+        let item = UIBarButtonItem(title: "Save", style: .plain, target: self, action: #selector(handleSaveButton))
+        navigationItem.rightBarButtonItem = item
+    }
+    
+    @objc private func handleSaveButton() {
+        
+        let controller = UIAlertController(title: nil, message: "Choose file format to save", preferredStyle: .actionSheet)
+        let xmlAction = UIAlertAction(title: "XML", style: .default) { _ in
+            self.viewModel.saveArticles(format: .xml)
+        }
+        controller.addAction(xmlAction)
+        let jsonAction = UIAlertAction(title: "JSON", style: .default) { _ in
+            self.viewModel.saveArticles(format: .json)
+        }
+        controller.addAction(jsonAction)
+        controller.addAction(UIAlertAction.init(title: "Cancel", style: .cancel))
+        self.present(controller, animated: true)
     }
     
     private func setupTableView() {
@@ -41,12 +63,16 @@ class MainViewController: UIViewController {
     }
     
     private func setupBindings() {
-        viewModel.showError = { error in
-            self.showError(error: error)
+        viewModel.showError = { [weak self] error in
+            DispatchQueue.main.async {
+                self?.showError(error: error)
+            }
         }
         
-        viewModel.updateView = {
-            self.tableView.reloadData()
+        viewModel.updateView = { [weak self] in
+            DispatchQueue.main.async {
+                self?.tableView.reloadData()
+            }
         }
     }
     

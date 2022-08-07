@@ -31,10 +31,15 @@ class ArticleFeedParser: NSObject {
             currentArticleUrl = currentArticleUrl.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
         }
     }
-    private var parserComplitionHandler: ((Result<[Article], NetworkError>) -> ())?
+    private var currentArticleImageUrl: String = "" {
+        didSet {
+            currentArticleImageUrl = currentArticleImageUrl.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        }
+    }
+    private var parserComplitionHandler: ((Result<[Article], ALError>) -> ())?
     
     
-    func parseFeed(data: Data, completionHandler: @escaping (Result<[Article], NetworkError>) -> ()) {
+    func parseFeed(data: Data, completionHandler: @escaping (Result<[Article], ALError>) -> ()) {
         self.parserComplitionHandler = completionHandler
         let parser = XMLParser(data: data)
         parser.delegate = self
@@ -55,6 +60,8 @@ extension ArticleFeedParser: XMLParserDelegate {
             currentTitle = ""
             currentDescription = ""
             currentPubDate = ""
+            currentArticleImageUrl = ""
+            currentArticleUrl = ""
         }
     }
     
@@ -69,6 +76,8 @@ extension ArticleFeedParser: XMLParserDelegate {
             currentPubDate += string
         case "link":
             currentArticleUrl += string
+        case "imageLink":
+            currentArticleImageUrl += string
         default :
             break
         }
@@ -77,7 +86,7 @@ extension ArticleFeedParser: XMLParserDelegate {
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         
         if elementName == "item" {
-            let article = Article(title: currentTitle, description: currentDescription, date: currentPubDate, url: currentArticleUrl)
+            let article = Article(title: currentTitle, description: currentDescription, date: currentPubDate, url: currentArticleUrl, imageUrl: currentArticleImageUrl)
             self.rssItems.append(article)
         }
     }

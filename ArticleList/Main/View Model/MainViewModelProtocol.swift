@@ -10,9 +10,10 @@ import Foundation
 protocol MainViewModelProtocol {
     
     var updateView: (() -> ())? {get set}
-    var showError: ((NetworkError) -> ())? {get set}
+    var showError: ((ALError) -> ())? {get set}
     func numberOfRows() -> Int
     func itemForRow(row: Int) -> Article
     func viewIsReady()
+    func saveArticles(format: DataFormat)
 }
 

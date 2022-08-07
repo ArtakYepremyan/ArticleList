@@ -8,7 +8,7 @@
 import Foundation
 protocol ArticlesDataSourceProtocol {
     
-    typealias CompletionHandlerResult = Result<[Article], NetworkError>
+    typealias CompletionHandlerResult = Result<[Article], ALError>
     typealias CompletionHandler = ((CompletionHandlerResult) -> ())
     
     func get(completionHandler: @escaping CompletionHandler)

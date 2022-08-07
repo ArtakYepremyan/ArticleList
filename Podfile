@@ -8,4 +8,5 @@ target 'ArticleList' do
   # Pods for ArticleList
 
 	pod "Nuke"
+  pod "AEXML"
 end

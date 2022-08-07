@@ -1,12 +1,12 @@
 //
-//  NetworkError.swift
+//  ALError.swift
 //  ArticleList
 //
 //  Created by Artak Yepremyan on 05.08.22.
 //
 
 import Foundation
-enum NetworkError: LocalizedError {
+enum ALError: LocalizedError {
     
     case http(statusCode: Int)
     case network(error: Error?)
